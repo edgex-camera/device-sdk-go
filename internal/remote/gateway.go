@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-const nodeInfoURL = "http://127.0.0.1:9000/api/v1/nodeinfo"
+const nodeInfoURL = "http://172.17.0.1:9000/api/v1/nodeinfo"
 
 type NodeInfo struct {
-	DhcpServer string `json:"dhcpserver"`
-	Key        string `json:"key"`
-	Vpn        string `json:"vpn"`
+	DhcpServer string `json:"dhcpserver,omitempty"`
+	Key        string `json:"key,omitempty"`
+	Vpn        string `json:"vpn,omitempty"`
 	WorkId     string `json:"workid"`
 }
 

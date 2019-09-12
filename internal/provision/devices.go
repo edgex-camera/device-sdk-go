@@ -47,8 +47,13 @@ func createDevice(dc common.DeviceConfig) error {
 
 	nodeInfo, err := remote.GetNodeInfo()
 	if err != nil {
+		errMsg := fmt.Sprintf("Failed to get node info from gateway")
+		common.LoggingClient.Error(errMsg)
 		return err
 	}
+	location := map[string]string{"nodeid": nodeInfo.WorkId}
+	regMsg := fmt.Sprintf("Device registered on location: %s", location)
+	common.LoggingClient.Info(regMsg)
 
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
 	device := &contract.Device{
@@ -60,7 +65,7 @@ func createDevice(dc common.DeviceConfig) error {
 		AdminState:     contract.Unlocked,
 		OperatingState: contract.Enabled,
 		AutoEvents:     dc.AutoEvents,
-		Location:       map[string]string{"nodeid": nodeInfo.WorkId},
+		Location:       location,
 	}
 	device.Origin = millis
 	device.Description = dc.Description
