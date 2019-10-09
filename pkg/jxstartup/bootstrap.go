@@ -15,6 +15,8 @@ import (
 	"syscall"
 
 	"github.com/edgexfoundry/device-sdk-go"
+	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/edgexfoundry/device-sdk-go/internal/remote"
 	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
 )
 
@@ -48,13 +50,13 @@ func StartService(serviceName string, serviceVersion string, driver dsModels.Pro
 
 	fmt.Fprintf(os.Stdout, "Calling service.Start.\n")
 	errChan := make(chan error, 2)
-	listenForInterrupt(errChan)
-
+	go listenForInterrupt(errChan)
 	err = Service.Start(errChan)
 	if err != nil {
 		return err
 	}
 	go listenForConfigChanges()
+	go updateDeviceLocation()
 
 	err = <-errChan
 	fmt.Fprintf(os.Stdout, "Terminating: %v.\n", err)
@@ -63,9 +65,31 @@ func StartService(serviceName string, serviceVersion string, driver dsModels.Pro
 }
 
 func listenForInterrupt(errChan chan error) {
-	go func() {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
-		errChan <- fmt.Errorf("%s", <-c)
-	}()
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
+	errChan <- fmt.Errorf("%s", <-c)
+}
+
+func updateDeviceLocation() {
+	nodeInfo, err := remote.GetNodeInfo()
+	if err != nil {
+		common.LoggingClient.Error("Failed to get node info from gateway")
+		return
+	}
+	location := map[string]string{"nodeid": nodeInfo.WorkId}
+
+	for _, d := range Service.Devices() {
+		if d.Location == nil {
+			d.Location = location
+			err := Service.UpdateDevice(d)
+
+			var msg string
+			if err != nil {
+				msg = fmt.Sprintf("Device location update failed: %s", err)
+			} else {
+				msg = fmt.Sprintf("Device location updated: %s", location)
+			}
+			common.LoggingClient.Info(msg)
+		}
+	}
 }

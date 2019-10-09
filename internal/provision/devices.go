@@ -14,7 +14,6 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/remote"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/google/uuid"
 )
@@ -45,16 +44,6 @@ func createDevice(dc common.DeviceConfig) error {
 		return fmt.Errorf(errMsg)
 	}
 
-	nodeInfo, err := remote.GetNodeInfo()
-	if err != nil {
-		errMsg := fmt.Sprintf("Failed to get node info from gateway")
-		common.LoggingClient.Error(errMsg)
-		return err
-	}
-	location := map[string]string{"nodeid": nodeInfo.WorkId}
-	regMsg := fmt.Sprintf("Device registered on location: %s", location)
-	common.LoggingClient.Info(regMsg)
-
 	millis := time.Now().UnixNano() / int64(time.Millisecond)
 	device := &contract.Device{
 		Name:           dc.Name,
@@ -65,7 +54,6 @@ func createDevice(dc common.DeviceConfig) error {
 		AdminState:     contract.Unlocked,
 		OperatingState: contract.Enabled,
 		AutoEvents:     dc.AutoEvents,
-		Location:       location,
 	}
 	device.Origin = millis
 	device.Description = dc.Description
