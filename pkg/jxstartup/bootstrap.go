@@ -55,7 +55,7 @@ func StartService(serviceName string, serviceVersion string, driver dsModels.Pro
 	if err != nil {
 		return err
 	}
-	go listenForConfigChanges()
+	go listenForConfigChanges(driver)
 	go updateDeviceLocation()
 
 	err = <-errChan

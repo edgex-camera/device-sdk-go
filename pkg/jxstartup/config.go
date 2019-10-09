@@ -9,13 +9,17 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/config"
 )
 
+type ConfigChangeListener interface {
+	OnConfigChange(old map[string]string, new map[string]string)
+}
+
 const driverKey = "Driver"
 
 func PutDriverConfig(name string, value []byte) error {
 	return config.RegistryClient.PutConfigurationValue(driverKey+"/"+name, value)
 }
 
-func listenForConfigChanges() {
+func listenForConfigChanges(listenerCandidate interface{}) {
 	errChannel := make(chan error)
 	updateChannel := make(chan interface{})
 
@@ -39,7 +43,9 @@ func listenForConfigChanges() {
 				if !ok {
 					common.LoggingClient.Error("listenForConfigChanges() type check failed")
 				}
-				// TODO: call callback
+				if listener, ok := listenerCandidate.(ConfigChangeListener); ok {
+					listener.OnConfigChange(common.CurrentConfig.Driver, *newDriver)
+				}
 				common.CurrentConfig.Driver = *newDriver
 				common.LoggingClient.Info("Driver configuration has been updated.")
 			} else {
