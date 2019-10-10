@@ -14,6 +14,7 @@ import (
 
 	"github.com/edgexfoundry/device-sdk-go/internal/cache"
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/edgexfoundry/device-sdk-go/internal/remote"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/google/uuid"
 )
@@ -38,6 +39,15 @@ func (s *Service) AddDevice(device contract.Device) (id string, err error) {
 	device.Origin = millis
 	device.Service = common.CurrentDeviceService
 	device.Profile = prf
+
+	// get nodeid from gateway, and put it in device.location
+	nodeInfo, err := remote.GetNodeInfo()
+	if err != nil {
+		errMsg := "Failed to get node info from gateway"
+		common.LoggingClient.Error(errMsg)
+		return "", fmt.Errorf(errMsg)
+	}
+	device.Location = map[string]string{"nodeid": nodeInfo.WorkId}
 	common.LoggingClient.Debug(fmt.Sprintf("Adding Device: %s", device.Name))
 
 	ctx := context.WithValue(context.Background(), common.CorrelationHeader, uuid.New().String())
