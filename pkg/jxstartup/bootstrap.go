@@ -76,6 +76,9 @@ func updateDeviceLocation() {
 		common.LoggingClient.Error("Failed to get node info from gateway")
 		return
 	}
+	if nodeInfo.WorkId == "" {
+		panic("Invalid nodeid")
+	}
 	location := map[string]string{"nodeid": nodeInfo.WorkId}
 
 	for _, d := range Service.Devices() {
