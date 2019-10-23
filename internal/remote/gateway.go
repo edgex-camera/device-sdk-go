@@ -12,7 +12,7 @@ type NodeInfo struct {
 	DhcpServer string `json:"dhcpserver"`
 	Key        string `json:"key"`
 	Vpn        string `json:"vpn"`
-	WorkId     string `json:"workid"`
+	WorkerId   string `json:"workerid"`
 }
 
 func GetNodeInfo() (nodeInfo NodeInfo, err error) {
