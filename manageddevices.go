@@ -45,7 +45,7 @@ func (s *Service) AddDevice(device contract.Device) (id string, err error) {
 	if err != nil {
 		errMsg := "Failed to get node info from gateway"
 		common.LoggingClient.Error(errMsg)
-		return "", fmt.Errorf(errMsg)
+		//return "", fmt.Errorf(errMsg)
 	}
 	device.Location = map[string]string{"nodeid": nodeInfo.WorkerId}
 	common.LoggingClient.Debug(fmt.Sprintf("Adding Device: %s", device.Name))
