@@ -9,6 +9,7 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -81,6 +82,11 @@ func LoadConfig(useRegistry string, profile string, confDir string) (configurati
 		if hasConfiguration {
 			// Get the configuration values from the Registry
 			rawConfig, err := RegistryClient.GetConfiguration(configuration)
+			loadConf, err := loadConfigFromFile(profile, confDir)
+
+			loadJson, _ := json.Marshal(loadConf)
+			json.Unmarshal(loadJson, &rawConfig)
+
 			if err != nil {
 				return nil, fmt.Errorf("could not get configuration from Registry: %v", err.Error())
 			}
@@ -91,6 +97,11 @@ func LoadConfig(useRegistry string, profile string, confDir string) (configurati
 			}
 
 			configuration = actual
+
+			//err = RegistryClient.PutConfiguration(*configuration, true)
+			//if err != nil {
+			//	return nil, fmt.Errorf("could not push configuration to Registry: %v", err.Error())
+			//}
 		} else {
 			// Self bootstrap the Registry with the device service's configuration
 			fmt.Fprintln(os.Stdout, "Pushing configuration into Registry...")
