@@ -30,6 +30,7 @@ import (
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/types"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 var (
@@ -69,6 +70,11 @@ func (s *Service) AsyncReadings() bool {
 
 // Start the Device Service.
 func (s *Service) Start(errChan chan error) (err error) {
+	return s.StartWithAppendRouter(errChan, nil)
+}
+
+// Start the Device Service.
+func (s *Service) StartWithAppendRouter(errChan chan error, appendRouter func(r *mux.Router)) (err error) {
 	err = clients.InitDependencyClients()
 	if err != nil {
 		return err
@@ -111,6 +117,11 @@ func (s *Service) Start(errChan chan error) (err error) {
 
 	// Setup REST API
 	r := controller.InitRestRoutes()
+
+	// Append Custom REST API
+	if appendRouter != nil {
+		appendRouter(r)
+	}
 
 	autoevent.GetManager().StartAutoEvents()
 	http.TimeoutHandler(nil, time.Millisecond*time.Duration(s.svcInfo.Timeout), "Request timed out")
