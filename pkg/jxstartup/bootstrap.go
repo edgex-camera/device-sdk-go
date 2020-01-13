@@ -10,6 +10,7 @@ package jxstartup
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,6 +19,7 @@ import (
 	"github.com/edgexfoundry/device-sdk-go/internal/common"
 	"github.com/edgexfoundry/device-sdk-go/internal/remote"
 	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 )
 
 var (
@@ -25,9 +27,15 @@ var (
 	confDir     string
 	useRegistry string = "consul://172.17.0.1:8500"
 
-	Service *device.Service
-	err     error
+	Service JxService
 )
+
+type JxService struct {
+	*device.Service
+
+	APIHandler      http.Handler
+	frontendHandler http.Handler
+}
 
 func init() {
 	flag.StringVar(&useRegistry, "registry", useRegistry, "Indicates the service should use the registry and provide the registry url.")
@@ -39,19 +47,37 @@ func init() {
 }
 
 func StartService(serviceName string, serviceVersion string, driver dsModels.ProtocolDriver) error {
+	return StartServiceWithHandler(serviceName, serviceVersion, driver, nil, "")
+}
+
+func StartServiceWithHandler(
+	serviceName string,
+	serviceVersion string,
+	driver dsModels.ProtocolDriver,
+	initHandler func(lc logger.LoggingClient) http.Handler,
+	staticFilePath string,
+) error {
 	if !flag.Parsed() {
 		flag.Parse()
 	}
 
-	Service, err = device.NewService(serviceName, serviceVersion, confProfile, confDir, useRegistry, driver)
+	service, err := device.NewService(serviceName, serviceVersion, confProfile, confDir, useRegistry, driver)
 	if err != nil {
 		return err
+	}
+
+	Service = JxService{
+		Service: service,
+	}
+	if initHandler != nil {
+		Service.APIHandler = initHandler(common.LoggingClient)
+		Service.frontendHandler = http.FileServer(http.Dir(staticFilePath))
 	}
 
 	fmt.Fprintf(os.Stdout, "Calling service.Start.\n")
 	errChan := make(chan error, 2)
 	go listenForInterrupt(errChan)
-	err = Service.Start(errChan)
+	err = Service.StartWithAppendRouter(errChan, Service.appendRouter)
 	if err != nil {
 		return err
 	}
