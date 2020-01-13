@@ -12,12 +12,10 @@ import (
 const APIV1Prefix = "/api/v1"
 
 func (js *JxService) appendRouter(r *mux.Router) {
-	sr := r.PathPrefix(APIV1Prefix).Subrouter()
+	r.HandleFunc("/name", js.handleName)
 
-	sr.HandleFunc("/name", js.handleName)
-
-	sr.HandleFunc("/driver/{dsname}/api/v1/{path:.*}", js.handleAPI)
-	sr.HandleFunc("/driver/{dsname}{path:.*}", js.handleFrontend)
+	r.PathPrefix("/driver/{dsname}/api/v1").HandlerFunc(js.handleAPI)
+	r.PathPrefix("/driver/{dsname}").HandlerFunc(js.handleFrontend)
 }
 
 func (js *JxService) handleName(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +46,7 @@ func (js *JxService) handleAPI(w http.ResponseWriter, r *http.Request) {
 }
 
 func (js *JxService) handleFrontend(w http.ResponseWriter, r *http.Request) {
-	js.checkDsname(r)
+	dsname := js.checkDsname(r)
+	r.URL.Path = strings.TrimPrefix(r.URL.Path, APIV1Prefix+"/driver/"+dsname)
 	js.frontendHandler.ServeHTTP(w, r)
 }
