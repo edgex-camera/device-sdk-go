@@ -70,6 +70,7 @@ func StartServiceWithHandler(
 		Service: service,
 	}
 	if initHandler != nil {
+		fmt.Fprintf(os.Stdout, "Initializing handlers.\n")
 		Service.APIHandler = initHandler(common.LoggingClient)
 		Service.frontendHandler = http.FileServer(http.Dir(staticFilePath))
 	}
