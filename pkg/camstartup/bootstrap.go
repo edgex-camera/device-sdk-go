@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package jxstartup
+package camstartup
 
 import (
 	"flag"
@@ -27,10 +27,10 @@ var (
 	confDir     string
 	useRegistry string = "consul://172.17.0.1:8500"
 
-	Service JxService
+	Service DService
 )
 
-type JxService struct {
+type DService struct {
 	*device.Service
 
 	APIHandler      http.Handler
@@ -66,7 +66,7 @@ func StartServiceWithHandler(
 		return err
 	}
 
-	Service = JxService{
+	Service = DService{
 		Service: service,
 	}
 	if initHandler != nil {

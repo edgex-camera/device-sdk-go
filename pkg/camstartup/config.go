@@ -1,4 +1,4 @@
-package jxstartup
+package camstartup
 
 import (
 	"os"
