@@ -7,7 +7,7 @@ MICROSERVICES=example/cmd/device-simple/device-simple
 
 VERSION=$(shell cat ./VERSION)
 
-GOFLAGS=-ldflags "-X github.com/edgexfoundry/device-sdk-go.Version=$(VERSION)"
+GOFLAGS=-ldflags "-X github.com/edgex-camera/device-sdk-go.Version=$(VERSION)"
 
 GIT_SHA=$(shell git rev-parse HEAD)
 

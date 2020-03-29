@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/cache"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/remote"
+	"github.com/edgex-camera/device-sdk-go/internal/cache"
+	"github.com/edgex-camera/device-sdk-go/internal/common"
+	"github.com/edgex-camera/device-sdk-go/internal/remote"
 	contract "github.com/edgexfoundry/go-mod-core-contracts/models"
 	"github.com/google/uuid"
 )

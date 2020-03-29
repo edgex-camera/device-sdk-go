@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
+	"github.com/edgex-camera/device-sdk-go/internal/common"
 )
 
 func checkTransformedValueInRange(origin interface{}, transformed float64) bool {

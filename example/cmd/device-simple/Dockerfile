@@ -6,7 +6,7 @@
 FROM golang:1.11-alpine AS builder
 
 ENV GO111MODULE=on
-WORKDIR /go/src/github.com/edgexfoundry/device-sdk-go
+WORKDIR /go/src/github.com/edgex-camera/device-sdk-go
 
 LABEL license='SPDX-License-Identifier: Apache-2.0' \
   copyright='Copyright (c) 2018, 2019: Intel'
@@ -35,7 +35,7 @@ ENV APP_PORT=49990
 EXPOSE $APP_PORT
 
 WORKDIR /
-COPY --from=builder /go/src/github.com/edgexfoundry/device-sdk-go/example/cmd/device-simple/device-simple /usr/local/bin/device-simple
-COPY --from=builder /go/src/github.com/edgexfoundry/device-sdk-go/example/cmd/device-simple/res/docker/configuration.toml /res/docker/configuration.toml
+COPY --from=builder /go/src/github.com/edgex-camera/device-sdk-go/example/cmd/device-simple/device-simple /usr/local/bin/device-simple
+COPY --from=builder /go/src/github.com/edgex-camera/device-sdk-go/example/cmd/device-simple/res/docker/configuration.toml /res/docker/configuration.toml
 
 CMD [ "/usr/local/bin/device-simple","--profile=docker","--confdir=/res"]

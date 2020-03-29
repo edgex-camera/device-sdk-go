@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package jxstartup
+package camstartup
 
 import (
 	"flag"
@@ -15,10 +15,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/edgexfoundry/device-sdk-go"
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/remote"
-	dsModels "github.com/edgexfoundry/device-sdk-go/pkg/models"
+	"github.com/edgex-camera/device-sdk-go"
+	"github.com/edgex-camera/device-sdk-go/internal/common"
+	"github.com/edgex-camera/device-sdk-go/internal/remote"
+	dsModels "github.com/edgex-camera/device-sdk-go/pkg/models"
 	"github.com/edgexfoundry/go-mod-core-contracts/clients/logger"
 )
 
@@ -27,10 +27,10 @@ var (
 	confDir     string
 	useRegistry string = "consul://172.17.0.1:8500"
 
-	Service JxService
+	Service DService
 )
 
-type JxService struct {
+type DService struct {
 	*device.Service
 
 	APIHandler      http.Handler
@@ -66,7 +66,7 @@ func StartServiceWithHandler(
 		return err
 	}
 
-	Service = JxService{
+	Service = DService{
 		Service: service,
 	}
 	if initHandler != nil {

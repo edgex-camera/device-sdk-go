@@ -1,12 +1,12 @@
-package jxstartup
+package camstartup
 
 import (
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/edgexfoundry/device-sdk-go/internal/common"
-	"github.com/edgexfoundry/device-sdk-go/internal/config"
+	"github.com/edgex-camera/device-sdk-go/internal/common"
+	"github.com/edgex-camera/device-sdk-go/internal/config"
 )
 
 type ConfigChangeListener interface {
